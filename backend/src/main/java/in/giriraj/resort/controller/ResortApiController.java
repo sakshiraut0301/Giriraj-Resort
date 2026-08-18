@@ -1,0 +1,47 @@
+package in.giriraj.resort.controller;
+
+import in.giriraj.resort.model.*;
+import in.giriraj.resort.repository.*;
+import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
+@RestController @RequestMapping("/api")
+public class ResortApiController {
+  private final UserRepository users; private final BookingRepository bookings; private final EnquiryRepository enquiries; private final RoomRepository rooms; private final GalleryItemRepository gallery; private final PasswordEncoder passwords;
+  public ResortApiController(UserRepository u, BookingRepository b, EnquiryRepository e, RoomRepository r, GalleryItemRepository g, PasswordEncoder p) {users=u;bookings=b;enquiries=e;rooms=r;gallery=g;passwords=p;}
+  @GetMapping("/health") public Map<String,String> health(){return Map.of("status","ok");}
+  @GetMapping("/rooms") public List<Map<String,Object>> allRooms(){return rooms.findAll().stream().map(this::roomView).toList();}
+  @GetMapping("/gallery") public List<Map<String,Object>> gallery(){return gallery.findAllByOrderByCreatedAtDesc().stream().<Map<String,Object>>map(g->Map.of("id",g.getId(),"mediaUrl",g.getMediaUrl(),"mediaType",g.getMediaType())).toList();}
+  @PostMapping(value="/gallery",consumes="multipart/form-data") @ResponseStatus(HttpStatus.CREATED) public Map<String,Object> uploadGallery(@RequestParam MultipartFile media){String type=media.getContentType();if(type==null||(!type.startsWith("image/")&&!type.startsWith("video/")))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Upload an image or video file.");GalleryItem g=new GalleryItem();g.setMediaType(type.startsWith("video/")?"video":"image");g.setMediaUrl(saveFile(media,"gallery"));gallery.save(g);return Map.of("id",g.getId(),"mediaUrl",g.getMediaUrl(),"mediaType",g.getMediaType());}
+  @PostMapping("/auth/register") @ResponseStatus(HttpStatus.CREATED) public Map<String,Object> register(@Valid @RequestBody RegisterRequest r,HttpSession s){if(users.findByEmailIgnoreCase(r.email()).isPresent())throw new ResponseStatusException(HttpStatus.CONFLICT,"An account already exists for this email.");User u=new User();u.setFullName(r.fullName().trim());u.setEmail(r.email().trim().toLowerCase());u.setPasswordHash(passwords.encode(r.password()));users.save(u);login(s,u);return profile(u);}
+  @PostMapping("/auth/login") public Map<String,Object> login(@Valid @RequestBody LoginRequest r,HttpSession s){User u=users.findByEmailIgnoreCase(r.email()).filter(x->passwords.matches(r.password(),x.getPasswordHash())).orElseThrow(()->new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Invalid email or password."));login(s,u);return profile(u);}
+  @PostMapping("/auth/logout") @ResponseStatus(HttpStatus.NO_CONTENT) public void logout(HttpSession s){s.invalidate();}
+  @GetMapping("/auth/me") public Map<String,Object> me(HttpSession s){return profile(current(s));}
+  @PostMapping("/enquiries") @ResponseStatus(HttpStatus.CREATED) public Map<String,String> enquiry(@Valid @RequestBody EnquiryRequest r){Enquiry e=new Enquiry();e.setName(r.name().trim());e.setEmail(r.email().trim());e.setMessage(r.message().trim());enquiries.save(e);return Map.of("message","Thank you, "+e.getName()+". We will be in touch shortly.");}
+  @PostMapping("/bookings") @ResponseStatus(HttpStatus.CREATED) public Map<String,Object> book(@Valid @RequestBody BookingRequest r,HttpSession s){Room room=rooms.findById(r.roomId()).orElseThrow(()->new ResponseStatusException(HttpStatus.BAD_REQUEST,"Select a valid room."));LocalDate out=r.checkIn().plusDays(r.nights());Booking b=new Booking();Object userId=s.getAttribute("userId");if(userId!=null)users.findById(UUID.fromString((String)userId)).ifPresent(b::setGuest);else users.findAll().stream().filter(u->u.getRole()==User.Role.ADMIN).findFirst().ifPresent(b::setGuest);b.setGuestName(r.guestName().trim());b.setReference("GR-"+(10000+(int)(Math.random()*89999)));b.setRoomName(room.getName()+" · "+room.getRoomNumber());b.setContactNumber(r.contactNumber().trim());b.setCheckIn(r.checkIn());b.setCheckOut(out);b.setGuests(r.guests());b.setTotalAmount(room.getPrice().multiply(BigDecimal.valueOf(r.nights())));bookings.save(b);return bookingView(b);}
+  @GetMapping("/bookings/my") public List<Map<String,Object>> mine(HttpSession s){return bookings.findByGuestIdOrderByCheckInDesc(current(s).getId()).stream().map(this::bookingView).toList();}
+  @GetMapping("/admin/overview") public Map<String,Object> overview(HttpSession s){requireAdmin(s);return Map.of("activeBookings",bookings.countByStatusIn(List.of(Booking.Status.PENDING,Booking.Status.CONFIRMED)),"guests",users.count()-1,"pendingEnquiries",enquiries.count(),"monthRevenue",bookings.findAll().stream().filter(b->b.getStatus()!=Booking.Status.CANCELLED).map(Booking::getTotalAmount).filter(Objects::nonNull).reduce(BigDecimal.ZERO,BigDecimal::add));}
+  @GetMapping("/admin/bookings") public List<Map<String,Object>> adminBookings(HttpSession s){requireAdmin(s);return bookings.findAll().stream().map(this::bookingView).toList();}
+  @GetMapping("/admin/enquiries") public List<Map<String,Object>> adminEnquiries(HttpSession s){requireAdmin(s);return enquiries.findAll().stream().sorted(Comparator.comparing(Enquiry::getCreatedAt).reversed()).<Map<String,Object>>map(e->Map.of("name",e.getName(),"email",e.getEmail(),"message",e.getMessage(),"createdAt",e.getCreatedAt())).toList();}
+  @PostMapping(value="/admin/rooms",consumes="multipart/form-data") @ResponseStatus(HttpStatus.CREATED) public Map<String,Object> addRoom(@RequestParam String roomNumber,@RequestParam String name,@RequestParam BigDecimal price,@RequestParam String amenities,@RequestParam(required=false) MultipartFile photo,HttpSession s){requireAdmin(s);if(price.signum()<0)throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Price must be valid.");Room r=new Room();r.setRoomNumber(roomNumber.trim());r.setName(name.trim());r.setPrice(price);r.setAmenities(amenities.trim());r.setPhotoUrl(savePhoto(photo));return roomView(rooms.save(r));}
+  @DeleteMapping("/admin/rooms/{id}") @ResponseStatus(HttpStatus.NO_CONTENT) public void deleteRoom(@PathVariable UUID id,HttpSession s){requireAdmin(s);rooms.deleteById(id);}
+  private String savePhoto(MultipartFile f){if(f==null||f.isEmpty())return "/assets/images/resort.jpg";if(f.getContentType()==null||!f.getContentType().startsWith("image/"))throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Please upload an image.");return saveFile(f,"rooms");}
+  private String saveFile(MultipartFile f,String folder){try{Path dir=Paths.get("../frontend/assets/uploads",folder);Files.createDirectories(dir);String name=UUID.randomUUID()+"-"+f.getOriginalFilename().replaceAll("[^a-zA-Z0-9._-]","_");Files.copy(f.getInputStream(),dir.resolve(name),StandardCopyOption.REPLACE_EXISTING);return "/assets/uploads/"+folder+"/"+name;}catch(IOException x){throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,"Could not save uploaded file.");}}
+  private User current(HttpSession s){Object id=s.getAttribute("userId");if(id==null)throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Please sign in first.");return users.findById(UUID.fromString((String)id)).orElseThrow(()->new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Account not found."));}
+  private void requireAdmin(HttpSession s){if(current(s).getRole()!=User.Role.ADMIN)throw new ResponseStatusException(HttpStatus.FORBIDDEN,"Administrator access required.");}
+  private void login(HttpSession s,User u){s.setAttribute("userId",u.getId().toString());} private Map<String,Object> profile(User u){return Map.of("id",u.getId(),"fullName",u.getFullName(),"email",u.getEmail(),"role",u.getRole());}
+  private Map<String,Object> roomView(Room r){return Map.of("id",r.getId(),"roomNumber",r.getRoomNumber(),"name",r.getName(),"price",r.getPrice(),"amenities",r.getAmenities(),"photoUrl",r.getPhotoUrl());} private Map<String,Object> bookingView(Booking b){return Map.of("id",b.getId(),"reference",b.getReference(),"guest",b.getGuestName()!=null?b.getGuestName():(b.getGuest()==null?"Guest":b.getGuest().getFullName()),"room",b.getRoomName(),"contactNumber",b.getContactNumber()==null?"":b.getContactNumber(),"checkIn",b.getCheckIn(),"checkOut",b.getCheckOut(),"guests",b.getGuests(),"totalAmount",b.getTotalAmount(),"status",b.getStatus());}
+  public record RegisterRequest(@NotBlank @Size(max=120)String fullName,@Email @NotBlank String email,@NotBlank @Size(min=6,max=72)String password){} public record LoginRequest(@Email @NotBlank String email,@NotBlank String password){} public record EnquiryRequest(@NotBlank @Size(max=120)String name,@Email @NotBlank String email,@NotBlank @Size(max=2000)String message){} public record BookingRequest(@NotNull UUID roomId,@NotBlank @Size(max=120)String guestName,@NotBlank @Size(max=30)String contactNumber,@NotNull @FutureOrPresent LocalDate checkIn,@NotNull @Min(1) @Max(30)Integer nights,@NotNull @Min(1) @Max(8)Integer guests){}
+}

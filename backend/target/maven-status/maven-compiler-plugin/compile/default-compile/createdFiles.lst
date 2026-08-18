@@ -1,0 +1,13 @@
+in\giriraj\resort\repository\UserRepository.class
+in\giriraj\resort\model\User$Role.class
+in\giriraj\resort\repository\EnquiryRepository.class
+in\giriraj\resort\GirirajApplication.class
+in\giriraj\resort\config\SecurityConfig.class
+in\giriraj\resort\config\WebConfig.class
+in\giriraj\resort\model\Booking.class
+in\giriraj\resort\repository\BookingRepository.class
+in\giriraj\resort\model\User.class
+in\giriraj\resort\model\Booking$Status.class
+in\giriraj\resort\model\Enquiry.class
+in\giriraj\resort\config\DemoDataConfig.class
+in\giriraj\resort\controller\PageController.class
