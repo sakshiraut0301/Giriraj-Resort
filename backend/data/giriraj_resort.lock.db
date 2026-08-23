@@ -1,6 +1,6 @@
 #FileLock
-#Tue Aug 18 13:00:37 IST 2026
-hostName=172.19.9.64
-id=1a013c779fdb46f828712b9536efb90d788462b938b
+#Sun Aug 23 17:12:06 IST 2026
+server=192.168.0.103\:51835
+hostName=GALAXY-BOOK-5
 method=file
-server=172.19.9.64\:51947
+id=1a02e6d8593ee381c6b60806b24ab729a8a6f754ff6

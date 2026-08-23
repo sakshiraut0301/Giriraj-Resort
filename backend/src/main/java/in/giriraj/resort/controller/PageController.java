@@ -10,6 +10,7 @@ public class PageController {
   @GetMapping("/experiences") public String experiences() { return "forward:/pages/experiences.html"; }
   @GetMapping("/contact") public String contact() { return "forward:/pages/contact.html"; }
   @GetMapping("/gallery") public String gallery() { return "forward:/pages/gallery.html"; }
+  @GetMapping("/feedback") public String feedback() { return "forward:/pages/feedback.html"; }
   @GetMapping("/login") public String login() { return "forward:/pages/login.html"; }
   @GetMapping("/dashboard") public String dashboard() { return "forward:/pages/user-dashboard.html"; }
   @GetMapping("/admin") public String admin() { return "forward:/pages/admin-dashboard.html"; }
