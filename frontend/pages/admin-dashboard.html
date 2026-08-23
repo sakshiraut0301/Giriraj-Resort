@@ -1,11 +1,142 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Admin | Giriraj Resort</title><link rel="stylesheet" href="/assets/styles.css"><script defer src="/assets/app.js"></script></head>
-<body onload="loadAdminDashboard()"><header class="nav"><a class="brand" href="/"><img src="/assets/giriraj-logo.svg" alt="Giriraj Resort logo"></a><nav><a href="/">View website</a><a href="#" onclick="logout();return false">Sign out</a></nav></header>
-<div class="admin-layout"><aside class="admin-sidebar"><p class="eyebrow">MANAGEMENT</p><a href="#overview">Overview</a><a href="#bookings">Booking requests</a><a href="#messages">Enquiries</a><a href="#feedback">Feedback</a><a href="#gallery-moderation">Gallery moderation</a><a href="#rooms">Rooms</a></aside>
-<main class="admin-content"><section id="overview" class="admin-overview"><p class="eyebrow">RESORT MANAGEMENT</p><h1>Admin dashboard</h1><p class="admin-lead">Review bookings, guest messages and community content from one clear workspace.</p><div class="stats"><div class="stat"><span>ACTIVE BOOKINGS</span><strong id="active-bookings">0</strong></div><div class="stat"><span>GUEST ACCOUNTS</span><strong id="registered-guests">0</strong></div><div class="stat"><span>ENQUIRIES</span><strong id="pending-enquiries">0</strong></div><div class="stat"><span>BOOKING REVENUE</span><strong id="month-revenue">₹0</strong></div></div></section>
-<section class="admin-section" id="rooms"><p class="eyebrow">ADD A BOOKABLE ROOM</p><h2>Room management</h2><form class="form room-form" onsubmit="submitRoom(event)"><label>ROOM NUMBER<input name="roomNumber" required placeholder="e.g. 101"></label><label>ROOM NAME<input name="name" required placeholder="e.g. Garden View Room"></label><label>PRICE PER NIGHT<input name="price" type="number" min="0" required></label><label>AMENITIES<textarea name="amenities" required placeholder="Wi-Fi, breakfast, balcony, air conditioning"></textarea></label><label>ROOM PHOTO<input name="photo" type="file" accept="image/*"></label><button class="button">Add room card →</button><p id="room-message"></p></form><div id="admin-room-list" class="admin-rooms"></div></section>
-<section class="admin-section" id="messages"><p class="eyebrow">NOTIFICATIONS · ENQUIRIES</p><h2>Guest messages</h2><div id="enquiry-list" class="notices"></div></section>
-<section class="admin-section" id="bookings"><p class="eyebrow">BOOKING DECISIONS</p><h2>Booking requests</h2><p class="notice">Approve only after confirming advance payment and room availability. The guest dashboard updates immediately.</p><table class="table"><thead><tr><th>BOOKING</th><th>GUEST</th><th>ROOM &amp; DATES</th><th>STATUS</th><th>ACTION</th></tr></thead><tbody id="admin-booking-list"></tbody></table></section>
-<section class="admin-section" id="feedback"><p class="eyebrow">GUEST FEEDBACK</p><h2>Feedback moderation</h2><p class="admin-section-copy">Feedback is public. Only you can remove it from the website.</p><div id="admin-feedback-list" class="moderation-grid"></div></section>
-<section class="admin-section" id="gallery-moderation"><p class="eyebrow">COMMUNITY GALLERY</p><h2>Gallery moderation</h2><p class="admin-section-copy">Community photos and videos remain public until removed here by an administrator.</p><div id="admin-gallery-list" class="moderation-grid"></div></section></main></div>
-<footer><span>© 2026 Giriraj Resort</span></footer></body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Admin | Giriraj Resort</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script defer src="/assets/app.js"></script>
+  </head>
+  <body onload="loadAdminDashboard()">
+    <header class="nav">
+      <a class="brand" href="/"
+        ><img src="/assets/giriraj-logo.svg" alt="Giriraj Resort logo"
+      /></a>
+      <nav>
+        <a href="/">View website</a
+        ><a
+          href="#"
+          onclick="
+            logout();
+            return false;
+          "
+          >Sign out</a
+        >
+      </nav>
+    </header>
+    <div class="admin-layout">
+      <aside class="admin-sidebar">
+        <p class="eyebrow">MANAGEMENT</p>
+        <a href="#overview">Overview</a><a href="#bookings">Booking requests</a
+        ><a href="#messages">Enquiries</a><a href="#feedback">Feedback</a
+        ><a href="#gallery-moderation">Gallery moderation</a
+        ><a href="#rooms">Rooms</a>
+      </aside>
+      <main class="admin-content">
+        <section id="overview" class="admin-overview">
+          <p class="eyebrow">RESORT MANAGEMENT</p>
+          <h1>Admin dashboard</h1>
+          <p class="admin-lead">
+            Review bookings, guest messages and community content from one clear
+            workspace.
+          </p>
+          <div class="stats">
+            <div class="stat">
+              <span>ACTIVE BOOKINGS</span
+              ><strong id="active-bookings">0</strong>
+            </div>
+            <div class="stat">
+              <span>GUEST ACCOUNTS</span
+              ><strong id="registered-guests">0</strong>
+            </div>
+            <div class="stat">
+              <span>ENQUIRIES</span><strong id="pending-enquiries">0</strong>
+            </div>
+            <div class="stat">
+              <span>BOOKING REVENUE</span><strong id="month-revenue">₹0</strong>
+            </div>
+          </div>
+        </section>
+        <section class="admin-section" id="rooms">
+          <p class="eyebrow">ADD A BOOKABLE ROOM</p>
+          <h2>Room management</h2>
+          <form class="form room-form" onsubmit="submitRoom(event)">
+            <label
+              >ROOM NUMBER<input
+                name="roomNumber"
+                required
+                placeholder="e.g. 101" /></label
+            ><label
+              >ROOM NAME<input
+                name="name"
+                required
+                placeholder="e.g. Garden View Room" /></label
+            ><label
+              >PRICE PER NIGHT<input
+                name="price"
+                type="number"
+                min="0"
+                required /></label
+            ><label
+              >AMENITIES<textarea
+                name="amenities"
+                required
+                placeholder="Wi-Fi, breakfast, balcony, air conditioning"
+              ></textarea></label
+            ><label
+              >ROOM PHOTO<input
+                name="photo"
+                type="file"
+                accept="image/*" /></label
+            ><button class="button">Add room card →</button>
+            <p id="room-message"></p>
+          </form>
+          <div id="admin-room-list" class="admin-rooms"></div>
+        </section>
+        <section class="admin-section" id="messages">
+          <p class="eyebrow">NOTIFICATIONS · ENQUIRIES</p>
+          <h2>Guest messages</h2>
+          <div id="enquiry-list" class="notices"></div>
+        </section>
+        <section class="admin-section" id="bookings">
+          <p class="eyebrow">BOOKING DECISIONS</p>
+          <h2>Booking requests</h2>
+          <p class="notice">
+            Approve only after confirming advance payment and room availability.
+            The guest dashboard updates immediately.
+          </p>
+          <table class="table">
+            <thead>
+              <tr>
+                <th>BOOKING</th>
+                <th>GUEST</th>
+                <th>ROOM &amp; DATES</th>
+                <th>STATUS</th>
+                <th>ACTION</th>
+              </tr>
+            </thead>
+            <tbody id="admin-booking-list"></tbody>
+          </table>
+        </section>
+        <section class="admin-section" id="feedback">
+          <p class="eyebrow">GUEST FEEDBACK</p>
+          <h2>Feedback moderation</h2>
+          <p class="admin-section-copy">
+            Feedback is public. Only you can remove it from the website.
+          </p>
+          <div id="admin-feedback-list" class="moderation-grid"></div>
+        </section>
+        <section class="admin-section" id="gallery-moderation">
+          <p class="eyebrow">COMMUNITY GALLERY</p>
+          <h2>Gallery moderation</h2>
+          <p class="admin-section-copy">
+            Community photos and videos remain public until removed here by an
+            administrator.
+          </p>
+          <div id="admin-gallery-list" class="moderation-grid"></div>
+        </section>
+      </main>
+    </div>
+    <footer><span>© 2026 Giriraj Resort</span></footer>
+  </body>
+</html>

@@ -1,5 +1,73 @@
 <!doctype html>
-<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Giriraj Resort</title><link rel="stylesheet" href="/assets/styles.css"><script defer src="/assets/app.js"></script></head>
-<body onload="loadRooms('#home-rooms',true)"><header class="nav"><a class="brand" href="/"><img src="/assets/giriraj-logo.svg" alt="Giriraj Resort logo"></a><nav><a href="/rooms">Rooms</a><a href="/gallery">Gallery</a><a href="/feedback">Feedback</a><a href="/contact">Contact</a><a href="/login">Sign in</a></nav></header>
-<main><section class="hero"><div class="hero-glass"><p class="eyebrow">A PEACEFUL ESCAPE</p><h1>Stay close to<br><em>nature.</em></h1><p>Rest among green hills, tall palms and the quiet beauty of Giriraj Resort.</p><a class="button" href="/rooms">Explore rooms →</a></div></section><section class="intro"><div><p class="eyebrow">WELCOME TO GIRIRAJ</p><h2>Slow mornings,<br><em>lush surroundings.</em></h2></div><p>Enjoy a comfortable stay surrounded by calm, greenery and warm hospitality.</p></section><section class="section"><p class="eyebrow">STAY WITH US</p><h2>Choose your <em>room.</em></h2><div id="home-rooms" class="cards"></div></section></main>
-<footer class="home-footer"><div><p class="eyebrow">PLAN YOUR ESCAPE</p><h2>Send an enquiry.</h2><p>Tell us your preferred dates, guests and any special requests.</p></div><form class="form footer-enquiry" onsubmit="submitEnquiry(event)"><label>YOUR NAME<input required name="name"></label><label>EMAIL ADDRESS<input required type="email" name="email"></label><label>MESSAGE<textarea required name="message" placeholder="Dates, guests or anything else you’d like us to know"></textarea></label><button class="button">Send enquiry →</button><p id="form-message"></p></form><div class="footer-bottom"><span>© 2026 Giriraj Resort</span><a href="/contact">Contact &amp; directions</a></div></footer></body></html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Giriraj Resort</title>
+    <link rel="stylesheet" href="/assets/styles.css" />
+    <script defer src="/assets/app.js"></script>
+  </head>
+  <body onload="loadRooms('#home-rooms', true)">
+    <header class="nav">
+      <a class="brand" href="/"
+        ><img src="/assets/giriraj-logo.svg" alt="Giriraj Resort logo"
+      /></a>
+      <nav>
+        <a href="/rooms">Rooms</a><a href="/gallery">Gallery</a
+        ><a href="/feedback">Feedback</a><a href="/contact">Contact</a
+        ><a href="/login">Sign in</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero">
+        <div class="hero-glass">
+          <p class="eyebrow">A PEACEFUL ESCAPE</p>
+          <h1>Stay close to<br /><em>nature.</em></h1>
+          <p>
+            Rest among green hills, tall palms and the quiet beauty of Giriraj
+            Resort.
+          </p>
+          <a class="button" href="/rooms">Explore rooms →</a>
+        </div>
+      </section>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">WELCOME TO GIRIRAJ</p>
+          <h2>Slow mornings,<br /><em>lush surroundings.</em></h2>
+        </div>
+        <p>
+          Enjoy a comfortable stay surrounded by calm, greenery and warm
+          hospitality.
+        </p>
+      </section>
+      <section class="section">
+        <p class="eyebrow">STAY WITH US</p>
+        <h2>Choose your <em>room.</em></h2>
+        <div id="home-rooms" class="cards"></div>
+      </section>
+    </main>
+    <footer class="home-footer">
+      <div>
+        <p class="eyebrow">PLAN YOUR ESCAPE</p>
+        <h2>Send an enquiry.</h2>
+        <p>Tell us your preferred dates, guests and any special requests.</p>
+      </div>
+      <form class="form footer-enquiry" onsubmit="submitEnquiry(event)">
+        <label>YOUR NAME<input required name="name" /></label
+        ><label>EMAIL ADDRESS<input required type="email" name="email" /></label
+        ><label
+          >MESSAGE<textarea
+            required
+            name="message"
+            placeholder="Dates, guests or anything else you’d like us to know"
+          ></textarea></label
+        ><button class="button">Send enquiry →</button>
+        <p id="form-message"></p>
+      </form>
+      <div class="footer-bottom">
+        <span>© 2026 Giriraj Resort</span
+        ><a href="/contact">Contact &amp; directions</a>
+      </div>
+    </footer>
+  </body>
+</html>
