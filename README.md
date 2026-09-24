@@ -43,7 +43,7 @@ Open `http://localhost:8081`.
 - `/rooms` — rooms and suites
 - `/experiences` — activities and resort experiences
 - `/contact` — enquiry form
-- `/login` — sign in screen
+- `/login` — sign-in screen
 - `/dashboard` — guest dashboard
 - `/admin` — administrator dashboard
 
