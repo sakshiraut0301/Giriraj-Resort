@@ -46,7 +46,19 @@ async function loadRooms(target, book = false) {
   }
 }
 // BOOKING MODAL: opens and closes the room-booking form.
-function selectRoom(id, name) {
+async function selectRoom(id, name) {
+  try {
+    await api("/api/auth/me");
+  } catch {
+    sessionStorage.setItem(
+      "pendingBookingRoom",
+      JSON.stringify({ id, name, redirect: location.pathname + location.search }),
+    );
+    location.href = `/login?redirect=${encodeURIComponent(
+      location.pathname + location.search,
+    )}`;
+    return;
+  }
   const modal = document.querySelector("#booking-modal");
   modal.querySelector("#roomId").value = id;
   modal.querySelector("#selected-room").textContent =
@@ -54,6 +66,23 @@ function selectRoom(id, name) {
   modal.classList.add("is-open");
   document.body.classList.add("modal-open");
   modal.querySelector('[name="guestName"]').focus();
+}
+function postAuthRedirect() {
+  const redirect = new URLSearchParams(location.search).get("redirect");
+  return redirect && redirect.startsWith("/") ? redirect : null;
+}
+function restorePendingBooking() {
+  const pending = sessionStorage.getItem("pendingBookingRoom");
+  if (!pending) return;
+  try {
+    const booking = JSON.parse(pending);
+    if (booking.redirect === location.pathname + location.search) {
+      sessionStorage.removeItem("pendingBookingRoom");
+      selectRoom(booking.id, booking.name);
+    }
+  } catch {
+    sessionStorage.removeItem("pendingBookingRoom");
+  }
 }
 function closeBookingModal() {
   document.querySelector("#booking-modal")?.classList.remove("is-open");
@@ -75,7 +104,7 @@ async function submitLogin(e) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(Object.fromEntries(new FormData(e.target))),
     });
-    location.href = u.role === "ADMIN" ? "/admin" : "/dashboard";
+    location.href = postAuthRedirect() || (u.role === "ADMIN" ? "/admin" : "/dashboard");
   } catch (x) {
     msg("#login-message", x.message, true);
   }
@@ -88,7 +117,7 @@ async function submitRegister(e) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(Object.fromEntries(new FormData(e.target))),
     });
-    location.href = "/dashboard";
+    location.href = postAuthRedirect() || "/dashboard";
   } catch (x) {
     msg("#register-message", x.message, true);
   }
@@ -353,4 +382,7 @@ async function submitFeedback(e) {
     msg("#feedback-message", x.message, true);
   }
 }
-document.addEventListener("DOMContentLoaded", addBookingModal);
+document.addEventListener("DOMContentLoaded", () => {
+  addBookingModal();
+  restorePendingBooking();
+});
